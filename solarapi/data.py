@@ -1,3 +1,4 @@
+"""solar-panel-inverter-logger database wrapper"""
 import mysql.connector
 import datetime
 
@@ -7,7 +8,15 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class SolarDataBase:
-    def __init__(self, host, user, password, database):
+    def __init__(self, host: str, user: str, password: str, database: str):
+        """SolarDataBase
+
+        Args:
+            host (str): mysql host
+            user (str): mysql user
+            password (str): mysql user password
+            database (str): database name
+        """
         self._db = mysql.connector.connect(
             host=host,
             user=user,
@@ -15,14 +24,27 @@ class SolarDataBase:
             database=database
         )
 
-    async def async_get_day_report(self, device, day: datetime.datetime):
+    async def async_get_day_report(self, device: str, day: datetime.datetime):
+        """Get day report from a device.
+
+        Args:
+            device (str): device name
+            day (datetime.datetime): day start at 00:00
+
+        Raises:
+            DeviceDoesNotExist: device does not exist.
+
+        Returns:
+            list: array with database rows as dictonaries.
+        """
         start = unix_time_millis(day)
         end = unix_time_millis(day + datetime.timedelta(days=1))
 
         cursor = self._db.cursor(dictionary=True)
 
         try:
-            cursor.execute(f"SELECT * FROM {device} WHERE time BETWEEN {start} AND {end}")
+            cursor.execute(
+                f"SELECT * FROM {device} WHERE time BETWEEN {start} AND {end}")
         except mysql.connector.errors.ProgrammingError:
             raise DeviceDoesNotExist
 
@@ -31,6 +53,11 @@ class SolarDataBase:
         return result
 
     async def async_get_devices(self):
+        """Get list of devices.
+
+        Returns:
+            list: array of device names.
+        """
         cursor = self._db.cursor()
         cursor.execute("show tables")
 

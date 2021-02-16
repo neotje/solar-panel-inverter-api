@@ -10,7 +10,9 @@ PACKAGES = find_packages()
 
 REQUIRED = [
     "aiohttp==3.7.3",
-    "mysql-connector-python==8.0.23"
+    "mysql-connector-python==8.0.23",
+    "aiohttp_cors==0.7.0",
+    "matplotlib==3.3.4"
 ]
 
 setup(
